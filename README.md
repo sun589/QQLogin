@@ -20,3 +20,27 @@
 </details>  
 
 ***再次声明:本软件仅用于学习用途,请勿用于违法行为 后果自负!***  
+****
+## 使用说明
+从[Release](https://github.com/sun589/QQLogin/releases/latest)下载最新版本，
+或者下载源代码，装好依赖，使用`python QQLogin.py`执行  
+下载完成后跟着以下步骤走：  
+### Step 1. 获取目标的Clientkey和QQ号
+开始之前，你先要获取目标的clientkey，推荐使用我的另一个项目[QQkey_Tool](https://github.com/sun589/QQkey_Tool)获取  
+clientkey一般是64位，96位和224位，这是要注意的  
+### Step 2. 运行程序，生成配置，修改配置，运行使用
+准备好key后，接下来就是运行程序了  
+> 注意：程序将默认修改代理，在**正常退出**时关闭代理，若程序未正常退出，请重新打开并正常关闭
+
+打开后差不多会像这样:  
+  
+![image](https://github.com/user-attachments/assets/45d6f98c-f153-4f06-90b4-08ca7989d179)  
+
+这时我们关闭程序,打开config.ini,差不多长这样:  
+
+![image](https://github.com/user-attachments/assets/992aa437-6c40-45b9-bd9e-08b4044e03be)
+
+根据实际情况修改配置后即可正常使用程序了  
+视频教程：https://img1.lookpic.cn/2024/12/31/bandicam-2024-12-31-20-32-09-495.mp4
+
+
