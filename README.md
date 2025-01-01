@@ -41,6 +41,37 @@ clientkey一般是64位，96位和224位，这是要注意的
 ![image](https://github.com/user-attachments/assets/992aa437-6c40-45b9-bd9e-08b4044e03be)
 
 根据实际情况修改配置后即可正常使用程序了  
-视频教程：https://img1.lookpic.cn/2024/12/31/bandicam-2024-12-31-20-32-09-495.mp4
-###### ~~实际上，他不止能登录QQ音乐，他的灵活性很大，怎么用就看你自己了（百度，网易云，4399……）~~
+视频教程：https://img1.lookpic.cn/2024/12/31/bandicam-2024-12-31-20-32-09-495.mp4  
+
+###### ~~实际上，他不止能登录QQ音乐，他的灵活性很大，怎么用就看你自己了（百度，网易云，4399……）~~  
+****
+## 常见问题
+### 运行程序后浏览器提示"不安全的连接"  
+![image](https://github.com/user-attachments/assets/335896b6-994a-4fcb-8028-90c2b612fd62)  
+
+如图  
+出现以上问题为证书未安装成功,需手动安装  
+解决方法如下:
+1.按下 `Win`+`r`  
+  
+![image](https://github.com/user-attachments/assets/e793dcca-90b8-46fa-b863-bd7773e6398b)
+
+2.输入以下命令后点确定：
+```
+%userprofile%\.mitmproxy\mitmproxy-ca-cert.cer
+```
+
+![image](https://github.com/user-attachments/assets/9e3a1a9e-aba3-4001-8249-2dae9fdbd0f8)
+
+然后跟着走：  
+
+![image](https://github.com/user-attachments/assets/da49c9c6-c762-4bb5-812a-729375adf999)  
+  
+![image](https://github.com/user-attachments/assets/b8f52eae-758b-4fbf-a134-a8189a6c32d9)  
+
+![image](https://github.com/user-attachments/assets/99497102-4205-40dc-aa33-fb4d9dea6636)  
+
+![image](https://github.com/user-attachments/assets/de600f1a-bddc-4f2f-b616-e71e5424de2f)
+
+安装后就解决了：）
 
