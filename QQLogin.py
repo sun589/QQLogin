@@ -6,7 +6,7 @@ Github仓库地址:https://github.com/sun589/QQLogin
 """
 import time
 from mitmproxy.tools.main import mitmdump
-from mitmproxy import http, options , ctx
+from mitmproxy import http, ctx
 from winproxy import ProxySetting
 import atexit
 import re
@@ -86,7 +86,7 @@ __jp0(var_sso_get_st_uin);""")
 addons = [Listener()]
 
 if __name__ == '__main__':
-    os.system("title QQ登录器 Github仓库地址:https://github.com/sun589/QQkey_Tool")
+    os.system("title QQ登录器 Github仓库地址:https://github.com/sun589/QQLogin")
     if not os.path.isfile('config.ini'):
         with open('config.ini', 'w', encoding='utf-8') as f:
             f.write("""[account]
@@ -109,9 +109,12 @@ auto_set_proxy=1
     config.read('config.ini', encoding='utf-8')
     port = config.get('proxy','port')
     auto_set_proxy = config.get('settings','auto_set_proxy')
+    print("[+] 开始搜索证书...")
     ca_certificates = [x509.load_der_x509_certificate(cert, backend=None).issuer.rfc4514_string() for
                        cert, encoding, trust in ssl.enum_certificates("CA")]
-    if not "O=mitmproxy,CN=mitmproxy" in ca_certificates:
+    root_certificates = [x509.load_der_x509_certificate(cert, backend=None).issuer.rfc4514_string() for
+                       cert, encoding, trust in ssl.enum_certificates("ROOT")]
+    if (not "O=mitmproxy,CN=mitmproxy" in ca_certificates) and (not "O=mitmproxy,CN=mitmproxy" in root_certificates):
         if not os.path.isfile(os.path.join(os.path.expanduser("~"), ".mitmproxy\\mitmproxy-ca-cert.cer")):
             print("[+] 正在生成证书...")
             print("[+] 请在程序关闭后重启以安装证书!")
@@ -145,6 +148,8 @@ auto_set_proxy=1
             print("[!] 您取消了安装请求,这意味着您可能将无法正常使用本工具!")
         finally:
             store.CertCloseStore(CERT_CLOSE_STORE_FORCE_FLAG)
+    else:
+        print("[+] 证书已安装!")
     try:
         nickname = requests.get(
             f"https://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?uins={config.get('account', 'uin')}",
