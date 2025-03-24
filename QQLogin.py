@@ -11,7 +11,6 @@ from winproxy import ProxySetting
 import atexit
 import re
 from configparser import ConfigParser
-import os
 import win32api
 import psutil
 from win32com.client import Dispatch
@@ -19,7 +18,10 @@ import win32crypt
 import threading
 import requests
 import ssl
+import os
+from cryptography.hazmat.backends import default_backend
 from cryptography import x509
+import win32cryptcon
 
 p = ProxySetting()
 
@@ -83,6 +85,48 @@ __jp0(var_sso_get_st_uin);""")
 }})
 """)
 
+def get_windows_certs():
+    certs = []
+    for cert_bytes, encoding, trust in ssl.enum_certificates("ROOT"):
+        # 将DER编码的证书转换为PEM格式
+        pem = ssl.DER_cert_to_PEM_cert(cert_bytes)
+        certs.append(pem)
+    return certs
+
+def parse_certificates(pem_certs):
+    parsed_certs = []
+    for pem in pem_certs:
+        try:
+            cert = x509.load_pem_x509_certificate(pem.encode(), default_backend())
+            subject = cert.subject
+            # 获取常用名称(CN)
+            cn = subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME)
+            cn = cn[0].value if cn else "Unknown"
+            issuer = cert.issuer.get_attributes_for_oid(x509.NameOID.COMMON_NAME)
+            issuer = issuer[0].value if issuer else "Unknown"
+            parsed_certs.append({
+                'subject_cn': cn,
+                'issuer_cn': issuer,
+                'pem': pem
+            })
+        except Exception as e:
+            print(f"Error parsing certificate: {e}")
+    return parsed_certs
+
+def add_cert_win32(cert_path):
+    store = win32crypt.CertOpenStore(
+        win32cryptcon.CERT_STORE_PROV_SYSTEM,
+        0,
+        None,
+        win32cryptcon.CERT_SYSTEM_STORE_LOCAL_MACHINE,
+        "Root"
+    )
+    with open(cert_path, 'rb') as f:
+        cert_data = f.read()
+    cert = win32crypt.CertCreateCertificateContext(win32cryptcon.X509_ASN_ENCODING, cert_data)
+    win32crypt.CertAddCertificateContextToStore(store, cert, win32cryptcon.CERT_STORE_ADD_ALWAYS, None)
+    store.close()
+
 addons = [Listener()]
 
 if __name__ == '__main__':
@@ -97,7 +141,7 @@ clientkey=0
 
 [proxy]
 # 代理端口
-port=8080
+port=34875
 
 [settings]
 # 自动设置代理,1为开启,0为关闭
@@ -110,17 +154,15 @@ auto_set_proxy=1
     port = config.get('proxy','port')
     auto_set_proxy = config.get('settings','auto_set_proxy')
     print("[+] 开始搜索证书...")
-    ca_certificates = [x509.load_der_x509_certificate(cert, backend=None).issuer.rfc4514_string() for
-                       cert, encoding, trust in ssl.enum_certificates("CA")]
-    root_certificates = [x509.load_der_x509_certificate(cert, backend=None).issuer.rfc4514_string() for
-                       cert, encoding, trust in ssl.enum_certificates("ROOT")]
-    if (not "O=mitmproxy,CN=mitmproxy" in ca_certificates) and (not "O=mitmproxy,CN=mitmproxy" in root_certificates):
+    ca_certificates = get_windows_certs()
+    ca_certificates = parse_certificates(ca_certificates)
+    ca_certificates = [i['issuer_cn'] for i in ca_certificates]
+    if all(i != "mitmproxy" for i in ca_certificates):
         if not os.path.isfile(os.path.join(os.path.expanduser("~"), ".mitmproxy\\mitmproxy-ca-cert.cer")):
             print("[+] 正在生成证书...")
             print("[+] 请在程序关闭后重启以安装证书!")
             threading.Thread(target=lambda: (time.sleep(5),os._exit(0))).start()
             mitmdump(['-p', port, '--quiet'])
-
         CERT_STORE_PROV_SYSTEM = 0x0000000A
         CERT_STORE_OPEN_EXISTING_FLAG = 0x00004000
         CRYPT_STRING_BASE64HEADER = 0x00000000
@@ -128,12 +170,9 @@ auto_set_proxy=1
         X509_ASN_ENCODING = 0x00000001
         CERT_STORE_ADD_REPLACE_EXISTING = 3
         CERT_CLOSE_STORE_FORCE_FLAG = 0x00000001
-
         crtPath = os.path.join(os.path.expanduser("~"), ".mitmproxy\\mitmproxy-ca-cert.cer")
-
         with open(crtPath, 'r') as f:
             cert_str = f.read()
-
         cert_byte = win32crypt.CryptStringToBinary(cert_str, CRYPT_STRING_BASE64HEADER)[0]
         store = win32crypt.CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, None,
                                          CERT_SYSTEM_STORE_CURRENT_USER_ACCOUNT | CERT_STORE_OPEN_EXISTING_FLAG, "ROOT")
@@ -184,4 +223,6 @@ auto_set_proxy=1
         atexit.register(close_proxy)
         win32api.SetConsoleCtrlHandler(close_proxy, True)
     print(f"[+] 当前程序代理已开放至*:{port}")
+    print("[!] 注意: 请使用Ctrl+c退出,否则代理将不会被正常关闭导致无法上网!")
+    print("[!] 注意: 若已经直接强制退出,请重启并手动Ctrl+c退出!")
     mitmdump(['-s',__file__,'-p',port,'--quiet','--set',f'nickname={nickname}','--set',f'uin={config.get("account","uin")}','--set',f'clientkey={config.get("account","clientkey")}'])
