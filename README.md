@@ -25,6 +25,7 @@
 - [QQLogin](#qqlogin)
   - [使用说明](#使用说明)
   - [常见问题 Q&A](#常见问题)
+    - [和QQKey_Tool的Key解析器区别&原理？](#和QQKey_Tool的Key解析器区别&原理？)
     - [运行程序后浏览器提示"不安全的连接"](#运行程序后浏览器提示不安全的连接)
 ****
 ## 使用说明
@@ -52,6 +53,9 @@ clientkey一般是64位，96位和224位，这是要注意的
 ###### ~~实际上，他不止能登录QQ音乐，他的灵活性很大，怎么用就看你自己了（百度，网易云，4399……）~~  
 ****
 ## 常见问题
+### 和[QQKey_Tool](https://github.com/sun589/QQkey_Tool)的Key解析器区别&原理？
+一般的key解析只能解析腾讯业务(如`QQ空间`、`QQ群`等)可是遇到QQ音乐/网易云等需要[`oAuth`](https://baike.baidu.com/item/oAuth/7153134)登录的地方
+会因为无法`callback`导致无法正常登录，本款工具的优势正是本处——通过修改QQ客户端返回的clientkey实现登录任何QQ登录网站
 ### 运行程序后浏览器提示"不安全的连接"  
 ![image](https://github.com/user-attachments/assets/335896b6-994a-4fcb-8028-90c2b612fd62)  
 
