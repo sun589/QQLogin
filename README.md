@@ -48,7 +48,7 @@ clientkey一般是64位，96位和224位，这是要注意的
 ![image](https://github.com/user-attachments/assets/992aa437-6c40-45b9-bd9e-08b4044e03be)
 
 根据实际情况修改配置后即可正常使用程序了  
-视频教程：https://img1.lookpic.cn/2024/12/31/bandicam-2024-12-31-20-32-09-495.mp4  
+视频教程：https://www.123865.com/s/p8FRVv-GiH8  
 
 ###### ~~实际上，他不止能登录QQ音乐，他的灵活性很大，怎么用就看你自己了（百度，网易云，4399……）~~  
 ****
